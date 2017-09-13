@@ -114,7 +114,7 @@ void InstrumentMemoryAccesses::instrument(Value *Pointer, Value *AccessSize,
         Function *Check, Instruction &I) {
     Builder->SetInsertPoint(I.getNextNode());
     Value *VoidPointer = Builder->CreatePointerCast(Pointer, VoidPtrTy);
-    errs() << "instrument instruction " << I << "\n";
+    //errs() << "instrument instruction " << I << "\n";
     //errs() << "Pointer: " << *Pointer << "\n";
     //errs() << "Size: " << *AccessSize << "\n";
     //errs() << Check->getName();
@@ -126,21 +126,23 @@ void InstrumentMemoryAccesses::instrument(Value *Pointer, Value *AccessSize,
 
     Value *RtFile = Builder->CreateGlobalStringPtr("N/A", ".str");
     Value *RtLine = ConstantInt::get(SizeTy, 0);
-    // Copy debug information if it is present.
-    if (MDNode *MD = I.getMetadata("dbg")) {
-        DebugLoc Loc(MD);
-        auto *Scope = cast<DIScope>(Loc.getScope());
-        unsigned Line = Loc.getLine();
-        RtFile = Builder->CreateGlobalStringPtr(Scope->getFilename().str().c_str(), ".str");
+    if (DILocation *loc = I.getDebugLoc()) {
+        //errs() << "Line:" << loc->getLine()
+        //    << ", Path:" << loc->getDirectory()
+        //    << ", File:" << loc->getFilename() << "\n";
+        unsigned Line = loc->getLine();
+        RtFile = Builder->CreateGlobalStringPtr(loc->getFilename().str().c_str(), ".str");
         RtLine = ConstantInt::get(SizeTy, Line);
-        errs() << Scope->getFilename() << " : " << Line << "\n";
     } else {
-        errs() << "No debug info, you won't get valid file:line messages\n";
+        errs() << "No debug info for instruction \""
+            << I << "\" you won't get valid file:line messages\n";
     }
 
     // Create ArrayRef to be passed to Builder->CreateCall.
     Value* args[] = {VoidPointer, AccessSize, RtFile, RtLine};
     CallInst *CI = Builder->CreateCall(Check, args);
+
+    // Copy debug information if it is present.
     if (MDNode *MD = I.getMetadata("dbg")) {
         CI->setMetadata("dbg", MD);
     }

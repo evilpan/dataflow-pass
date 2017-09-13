@@ -6,8 +6,8 @@
 #include <errno.h>
 #include <strings.h>
 #define MAXSIZE 2048
-extern void init_sanitizer(void *ptr, size_t size);
 
+#include "runtime.h"
 void foo(char *buf, int size) {
     char a = buf[0];
     char b = buf[9];
@@ -34,11 +34,12 @@ int main(int argc, char **argv)
     bzero(buf, MAXSIZE+1);
     int rdsize = read(fd, buf, MAXSIZE);
     printf("read %d from file\n", rdsize);
-    init_sanitizer(buf, rdsize);
+    df_init(buf, rdsize);
 
     if (rdsize > 10)
         foo(buf, rdsize);
     else
         bar(buf, rdsize);
+    df_stat();
     return 0;
 }
