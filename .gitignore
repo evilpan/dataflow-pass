@@ -1,4 +1,5 @@
 build
+Output
 *.swp
 *.o
 a.out

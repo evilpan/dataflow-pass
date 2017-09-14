@@ -37,9 +37,10 @@ void __loadcheck(unsigned char *ptr, size_t size,
         INCREASE(clean_load);
     }
     INCREASE(total_load);
-    DF_LOG("check [%d] load at (%p size %zu) in %s:%zu",
-            tainted, ptr, size,
-            file, line);
+    DF_LOG("%s:%zu: %s load %zu byte(s)",
+            file, line,
+            tainted ? "tainted" : "clean",
+            size);
     return;
 }
 void __storecheck(unsigned char *ptr, size_t size,
@@ -52,8 +53,9 @@ void __storecheck(unsigned char *ptr, size_t size,
         INCREASE(clean_store);
     }
     INCREASE(total_store);
-    DF_LOG("check [%d] store at (%p size %zu) in %s:%zu",
-            tainted, ptr, size,
-            file, line);
+    DF_LOG("%s:%zu: %s store %zu byte(s)",
+            file, line,
+            tainted ? "tainted" : "clean",
+            size);
     return;
 }

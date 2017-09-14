@@ -1,3 +1,8 @@
+// RUN: clang -c -g -fsanitize=dataflow -std=c11 -Xclang -load -Xclang %buildir/dataflow/libLoadStorePass.so -I%runtimedir -c %s -o %t.o > %t.log 2>&1
+// RUN: clang -c -g -fsanitize=dataflow -std=c11 %runtimedir/runtime.c -I%runtimedir -o %t.runtime.o >> %t.log 2>&1
+// RUN: clang -fsanitize=dataflow %t.runtime.o %t.o -o %t.out >> %t.log 2>&1
+// RUN: %t.out > %t1.log 2>&1
+// RUN: FileCheck -input-file=%t1.log %s
 #include <stdio.h>
 #include "runtime.h"
 #define SIN_2PI_16 0.38268343236508978
@@ -169,7 +174,9 @@ int main() {
     R16SRFFT(data,output);
     printf("\nresult is:\n");
     printf("k,\t\tReal Part\t\tImaginary Part\n");
+    // CHECK: test_fft.c:[[@LINE+1]]: tainted load 4 byte(s)
     printf("0\t\t%.9f\t\t%.9f\n",output[0],zero);
+    // CHECK: test_fft.c:[[@LINE+1]]: tainted load 4 byte(s)
     printf("1\t\t%.9f\t\t%.9f\n",output[1],output[9]);
     printf("2\t\t%.9f\t\t%.9f\n",output[2],output[10]);
     printf("3\t\t%.9f\t\t%.9f\n",output[3],output[11]);
@@ -186,6 +193,8 @@ int main() {
     printf("14\t\t%.9f\t\t%.9f\n",output[2],-output[9]);
     printf("15\t\t%.9f\t\t%.9f\n",output[1],-output[8]);
 
+    // CHECK: total 218 load, 166 tainted, 52 clean
+    // CHECK-NEXT: total 66 store, 64 tainted, 2 clean
     df_stat();
     return 0;
 }

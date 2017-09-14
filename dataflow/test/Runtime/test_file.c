@@ -1,3 +1,8 @@
+// RUN: clang -c -g -fsanitize=dataflow -std=c11 -Xclang -load -Xclang %buildir/dataflow/libLoadStorePass.so -I%runtimedir -c %s -o %t.o > %t.log 2>&1
+// RUN: clang -c -g -fsanitize=dataflow -std=c11 %runtimedir/runtime.c -I%runtimedir -o %t.runtime.o >> %t.log 2>&1
+// RUN: clang -fsanitize=dataflow %t.runtime.o %t.o -o %t.out >> %t.log 2>&1
+// RUN: %t.out /etc/passwd > %t1.log 2>&1
+// RUN: FileCheck -input-file=%t1.log -check-prefix=CHECK-FOO %s
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -6,12 +11,15 @@
 #include <errno.h>
 #include <strings.h>
 #define MAXSIZE 2048
-
 #include "runtime.h"
 void foo(char *buf, int size) {
+    // CHECK-FOO: test_file.c:[[@LINE+1]]: tainted load 1 byte(s)
     char a = buf[0];
+    // CHECK-FOO: test_file.c:[[@LINE+1]]: tainted load 1 byte(s)
     char b = buf[9];
+    // CHECK-FOO: test_file.c:[[@LINE+1]]: tainted store 1 byte(s)
     buf[size] = a+b;
+    // CHECK-FOO: test_file.c:[[@LINE+1]]: clean store 1 byte(s)
     buf[size] = 1;
 }
 void bar(char *buf, int size) {
