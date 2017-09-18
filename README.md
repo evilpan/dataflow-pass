@@ -63,8 +63,6 @@ DF_RUNTIME: total 12 load, 4 tainted, 8 clean
 DF_RUNTIME: total 6 store, 3 tainted, 3 clean
 DF_RUNTIME: test_trivial.c:52: clean store 4 byte(s)
 DF_RUNTIME: test_trivial.c:53: clean load 4 byte(s)
-DF_RUNTIME: total 12 load, 4 tainted, 8 clean
-DF_RUNTIME: total 6 store, 3 tainted, 3 clean
 ```
 
 

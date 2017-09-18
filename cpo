@@ -1,0 +1,6 @@
+#!/bin/sh
+# taken from https://public.kitware.com/pipermail/cmake/2011-January/042284.html
+d=$1; shift
+while [ "$1" != "--" ]; do
+    cp -v $1 $d/$(basename $1); shift
+done
