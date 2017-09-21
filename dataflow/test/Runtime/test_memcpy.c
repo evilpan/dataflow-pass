@@ -16,9 +16,12 @@ int main()
     memcpy(dst, src, MAXSIZE/2);
 
     char temp;
+    // CHECK: test_memcpy.c:[[@LINE+1]]: tainted load 1 byte(s)
     temp = dst[0];
+    // CHECK: test_memcpy.c:[[@LINE+1]]: tainted load 1 byte(s)
     temp = dst[MAXSIZE/2 - 1];
-    temp = dst[MAXSIZE - 1];
+    // CHECK: test_memcpy.c:[[@LINE+1]]: clean load 1 byte(s)
+    temp = dst[MAXSIZE/2];
 
     df_stat();
     return 0;
