@@ -4,7 +4,7 @@ LDFLAGS=-fsanitize=dataflow
 BUILD=../build
 RUNTIME=../dataflow/runtime
 
-sources=$(wildcard *.c)
+sources=$(wildcard example_*.c)
 objects=$(patsubst %.c, %.o, $(sources))
 targets=$(patsubst %.c, %, $(sources))
 
