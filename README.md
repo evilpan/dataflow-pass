@@ -1,6 +1,6 @@
 # dataflow pass
 
-A trivial LLVM pass that instruct tainted memory access with [DFSsan](dfsan).
+A trivial LLVM pass that instruct tainted memory access with [DFSsan][dfsan].
 
 ## Requirement:
 
